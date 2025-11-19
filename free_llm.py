@@ -12,4 +12,4 @@ class FreeLLM:
             print("Cache hit - saved API call")
             return cached
         
-        # response = requests
+        response = requests
