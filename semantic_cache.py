@@ -1,7 +1,7 @@
 import numpy as np
 import sqlite3
 import pickle
-from sentence_transformers import SentenceTransformer
+from sentence-transformers import SentenceTransformer
 
 class SemanticCache:
     def __init__(self, threshold=0.85):
@@ -35,7 +35,8 @@ class SemanticCache:
                     np.linalg.norm(prompt_embeddings) * np.linalg.norm(cached_embedings))
                 
                 if cosine_similarity >= self.threshold:
-                    self.conn.execute('UPDATE cache SET hits=hits+1 WHERE id=?', row[0])
+                    self.conn.execute('UPDATE cache SET hits=hits+1 WHERE id=?', (row[0],))
+
                     self.conn.commit()
                     return row[2]  # return cached response
                 
@@ -47,7 +48,7 @@ class SemanticCache:
     def set (self, prompt, response):
         try:
             prompt_embeddings = self.encoder.encode(prompt, convert_to_tensor=True)
-            self.conn.execute('Insert INTO cache (embedding, response) VALUES (?, ?)', pickle.dumps(prompt_embeddings), response)
+            self.conn.execute('INSERT INTO cache (embedding, response) VALUES (?, ?)', (pickle.dumps(prompt_embeddings), response))
             self.conn.commit()
         except Exception as e:
             print(f"Error during cache storage: {e}")
